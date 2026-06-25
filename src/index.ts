@@ -9,7 +9,10 @@ import {
   listArticles,
   processFeed,
   processAllFeeds,
+  getSummarizedArticle,
+  getSummarizedArticles,
 } from "./services/newsletter";
+import { getPreferences, setPreferences } from "./services/preferences";
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -75,6 +78,62 @@ app.get("/articles", async (req, res, next) => {
     next(err);
   }
 });
+
+// Get summarized article by ID
+app.get("/articles/summary/:id", async (req, res, next) => {
+  try {
+    const articleId = parseInt(req.params.id, 10);
+    if (isNaN(articleId))
+      return res.status(400).json({ error: "invalid article id" });
+    const article = await getSummarizedArticle(articleId);
+    if (!article) return res.status(404).json({ error: "article not found" });
+    res.json(article);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Get all summarized articles
+app.get("/articles/summary", async (_req, res, next) => {
+  try {
+    const articles = await getSummarizedArticles();
+    if (!articles) return res.status(404).json({ error: "no articles found" });
+    const summarizedArticles = articles.map((article) => ({
+      title: article.title,
+      url: article.url,
+      summary: article.summary,
+    }));
+    res.json(summarizedArticles);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Preferences
+app.get("/preferences", async (_req, res, next) => {
+  try {
+    const preferences = await getPreferences();
+    res.json({ preferences });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post(
+  "/preferences",
+  async (req: Request<{}, {}, { preferences: string[] }>, res, next) => {
+    try {
+      const { preferences } = req.body;
+      if (!Array.isArray(preferences)) {
+        return res.status(400).json({ error: "preferences must be an array" });
+      }
+      await setPreferences(preferences);
+      res.status(200).send();
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // Error handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

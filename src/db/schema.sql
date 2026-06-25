@@ -15,3 +15,13 @@ CREATE TABLE IF NOT EXISTS articles (
   summary      TEXT,
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS preferences (
+  id          SERIAL PRIMARY KEY,
+  preferences TEXT[] NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- If this were to be something deployed to cloud and not run locally:
+-- May require a users table in the future for user-specific requirements
+-- User table and preferences table

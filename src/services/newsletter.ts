@@ -1,5 +1,6 @@
 import { pool } from "../db/client";
 import { logger } from "../logger";
+import { getPreferences } from "./preferences";
 import { fetchFeed } from "./rss";
 import { summarize } from "./summarizer";
 
@@ -53,12 +54,31 @@ export async function listArticles(feedId?: number): Promise<Article[]> {
   return rows;
 }
 
+export async function getSummarizedArticle(
+  articleId: number,
+): Promise<Article | null> {
+  logger.info({ articleId }, "Fetching summarized article");
+  const { rows } = await pool.query<Article>(
+    "SELECT * FROM articles WHERE id = $1",
+    [articleId],
+  );
+  return rows[0] ?? null;
+}
+
+export async function getSummarizedArticles(): Promise<Article[] | null> {
+  logger.info("Fetching all summarized articles");
+  const { rows } = await pool.query<Article>("SELECT * FROM articles");
+  return rows ?? null;
+}
+
 export async function processFeed(
   feedId: number,
 ): Promise<{ added: number; skipped: number }> {
   const { rows } = await pool.query<Feed>("SELECT * FROM feeds WHERE id = $1", [
     feedId,
   ]);
+
+  const preferences = await getPreferences();
 
   const feed = rows[0];
   if (!feed) throw new Error(`Feed ${feedId} not found`);
@@ -80,7 +100,7 @@ export async function processFeed(
     }
 
     logger.info({ title: item.title }, "Summarising article");
-    const summary = await summarize(item.title, item.content);
+    const summary = await summarize(item.title, item.content, preferences);
 
     await pool.query(
       `INSERT INTO articles (feed_id, title, url, published_at, content, summary)
