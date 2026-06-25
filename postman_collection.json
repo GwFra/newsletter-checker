@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "Newsletter Checker",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/",
+            "description": "Health check — returns hello world."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feeds",
+      "item": [
+        {
+          "name": "List feeds",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/feeds",
+            "description": "Returns all registered RSS feeds."
+          }
+        },
+        {
+          "name": "Add feed",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeds",
+            "description": "Register a new RSS feed URL.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/rss\",\n  \"name\": \"Example Blog\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Process feed",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeds/1/process",
+            "description": "Fetch the feed, summarise new articles with OpenAI, and store them. Replace `1` with the feed id."
+          }
+        },
+        {
+          "name": "Process all feeds",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/feeds/process",
+            "description": "Fetch and process every registered feed in sequence. Returns an array of { feedId, added, skipped } results."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Articles",
+      "item": [
+        {
+          "name": "List all articles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/articles",
+            "description": "Returns all stored articles across every feed, ordered by publish date."
+          }
+        },
+        {
+          "name": "List articles by feed",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/articles?feedId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles"],
+              "query": [
+                {
+                  "key": "feedId",
+                  "value": "1",
+                  "description": "Filter by feed id"
+                }
+              ]
+            },
+            "description": "Returns articles for a specific feed. Replace `feedId` value as needed."
+          }
+        }
+      ]
+    }
+  ]
+}
