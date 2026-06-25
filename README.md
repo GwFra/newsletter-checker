@@ -12,14 +12,18 @@ npm run dev
 
 ## API
 
-| Method | Path                 | Description                                         |
-| ------ | -------------------- | --------------------------------------------------- |
-| `GET`  | `/feeds`             | List all feeds                                      |
-| `POST` | `/feeds`             | Add a feed `{ url, name? }`                         |
-| `POST` | `/feeds/:id/process` | Fetch, summarise, and store new articles for a feed |
-| `POST` | `/feeds/process`     | Process all feeds                                   |
-| `GET`  | `/articles`          | List all articles                                   |
-| `GET`  | `/articles?feedId=`  | List articles for a specific feed                   |
+| Method | Path                    | Description                                         |
+| ------ | ----------------------- | --------------------------------------------------- |
+| `GET`  | `/feeds`                | List all feeds                                      |
+| `POST` | `/feeds`                | Add a feed `{ url, name? }`                         |
+| `POST` | `/feeds/:id/process`    | Fetch, summarise, and store new articles for a feed |
+| `POST` | `/feeds/process`        | Process all feeds                                   |
+| `GET`  | `/articles`             | List all articles                                   |
+| `GET`  | `/articles/summary/:id` | List all article summary                            |
+| `GET`  | `/articles/summary`     | List all article summaries                          |
+| `GET`  | `/articles?feedId=`     | List articles for a specific feed                   |
+| `GET`  | `/preferences`          | Get saved preferences for articles                  |
+| `POST` | `/preferences`          | Update preferences for article content              |
 
 A Postman collection is available at `postman_collection.json`.
 
